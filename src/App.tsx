@@ -9,17 +9,21 @@ function App() {
   const [totalExpense, setTotalExpense] = useState(0);
 
   const refreshStats = () => {
-    setBalance(getBalance());
-    setTotalIncome(getTotalIncome());
-    setTotalExpense(getTotalExpense());
-  };
+  setBalance(getBalance());
+  setTotalIncome(getTotalIncome());
+  setTotalExpense(getTotalExpense());
+};
 
-  useEffect(() => {
+useEffect(() => {
+  refreshStats();
+  
+  const handleUpdate = () => {
     refreshStats();
-    const handleUpdate = () => refreshStats();
-    window.addEventListener('transaction-updated', handleUpdate);
-    return () => window.removeEventListener('transaction-updated', handleUpdate);
-  }, []);
+  };
+  
+  window.addEventListener('transaction-updated', handleUpdate);
+  return () => window.removeEventListener('transaction-updated', handleUpdate);
+}, []);
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
@@ -44,6 +48,18 @@ function App() {
       <TransactionList />
     </div>
   );
+  useEffect(() => {
+  refreshStats();
+  
+  const handleUpdate = () => {
+    refreshStats();
+    // 强制刷新交易列表
+    window.dispatchEvent(new Event('storage'));
+  };
+  
+  window.addEventListener('transaction-updated', handleUpdate);
+  return () => window.removeEventListener('transaction-updated', handleUpdate);
+}, []);
 }
 
 export default App;

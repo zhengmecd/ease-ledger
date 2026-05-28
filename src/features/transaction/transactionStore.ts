@@ -1,12 +1,27 @@
 export interface Transaction {
   id: string;
-  amount: number;  // 正数=收入，负数=支出
+  amount: number;
   category: string;
   note?: string;
   date: string;
 }
 
-let transactions: Transaction[] = [];
+// 从 localStorage 加载数据
+function loadTransactions(): Transaction[] {
+  const stored = localStorage.getItem('transactions');
+  if (stored) {
+    return JSON.parse(stored);
+  }
+  return [];
+}
+
+// 保存数据到 localStorage
+function saveTransactions(transactions: Transaction[]) {
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+}
+
+// 初始化内存数据
+let transactions: Transaction[] = loadTransactions();
 
 export function addTransaction(amount: number, category: string, note?: string): Transaction {
   const newTransaction: Transaction = {
@@ -17,6 +32,7 @@ export function addTransaction(amount: number, category: string, note?: string):
     date: new Date().toISOString().split('T')[0]
   };
   transactions = [newTransaction, ...transactions];
+  saveTransactions(transactions);
   return newTransaction;
 }
 
@@ -38,4 +54,10 @@ export function getTotalExpense(): number {
 
 export function clearTransactions(): void {
   transactions = [];
+  saveTransactions(transactions);
+}
+
+export function deleteTransaction(id: string): void {
+  transactions = transactions.filter(t => t.id !== id);
+  saveTransactions(transactions);
 }

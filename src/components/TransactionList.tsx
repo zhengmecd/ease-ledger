@@ -4,18 +4,19 @@ import { getTransactions, Transaction } from '../features/transaction/transactio
 export function TransactionList() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  useEffect(() => {
-    setTransactions(getTransactions());
-  }, []);
-
   const refresh = () => {
-    setTransactions(getTransactions());
+    setTransactions([...getTransactions()]);
   };
 
-  // 监听自定义事件，当添加交易时刷新
   useEffect(() => {
-    window.addEventListener('transaction-updated', refresh);
-    return () => window.removeEventListener('transaction-updated', refresh);
+    refresh();
+    
+    const handleUpdate = () => {
+      refresh();
+    };
+    
+    window.addEventListener('transaction-updated', handleUpdate);
+    return () => window.removeEventListener('transaction-updated', handleUpdate);
   }, []);
 
   return (

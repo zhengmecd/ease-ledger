@@ -7,15 +7,21 @@ export function TransactionForm() {
   const [type, setType] = useState<'expense' | 'income'>('expense');
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount === 0) return;
-    
-    const finalAmount = type === 'expense' ? -Math.abs(numAmount) : Math.abs(numAmount);
-    addTransaction(finalAmount, category);
-    
-    setAmount('');
-  };
+  e.preventDefault();
+  const numAmount = parseFloat(amount);
+  if (isNaN(numAmount) || numAmount === 0) return;
+  
+  const finalAmount = type === 'expense' ? -Math.abs(numAmount) : Math.abs(numAmount);
+  addTransaction(finalAmount, category);
+  
+  // 清空表单
+  setAmount('');
+  
+  // 触发自定义事件，通知其他组件刷新
+  window.dispatchEvent(new CustomEvent('transaction-updated'));
+  
+  // 去掉这行：window.location.reload();
+};
 
   return (
     <form onSubmit={handleSubmit} style={{ padding: '20px', borderBottom: '1px solid #ccc' }}>
